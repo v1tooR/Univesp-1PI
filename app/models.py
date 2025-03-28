@@ -1,4 +1,6 @@
 from django.db import models
+from django.apps import apps
+apps.ready = True  # Força o reconhecimento dos modelos
 
 class Produto(models.Model):
     nome = models.CharField(max_length=100)
@@ -9,4 +11,4 @@ class Produto(models.Model):
     foto = models.ImageField(upload_to='produtos/', blank=True, null=True)
 
     class Meta:
-        app_label = 'univesp-1pi'  # Fundamental para o Django reconhecer o modelo
+        app_label = 'app'  # Fundamental para o Django reconhecer o app
