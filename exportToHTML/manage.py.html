@@ -1,0 +1,91 @@
+<html>
+<head>
+<title>manage.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #7a7e85;}
+.s1 { color: #bcbec4;}
+.s2 { color: #cf8e6d;}
+.s3 { color: #bcbec4;}
+.s4 { color: #6aab73;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+manage.py</font>
+</center></td></tr></table>
+<pre><span class="s0">#!/usr/bin/env python</span>
+<span class="s2">import </span><span class="s1">os</span>
+<span class="s2">import </span><span class="s1">sys</span>
+<span class="s2">import </span><span class="s1">django</span>
+<span class="s2">from </span><span class="s1">django</span><span class="s3">.</span><span class="s1">conf </span><span class="s2">import </span><span class="s1">settings</span>
+<span class="s2">from </span><span class="s1">django</span><span class="s3">.</span><span class="s1">core</span><span class="s3">.</span><span class="s1">management </span><span class="s2">import </span><span class="s1">execute_from_command_line</span>
+<span class="s2">from </span><span class="s1">config </span><span class="s2">import </span><span class="s1">BASE_DIR</span><span class="s3">, </span><span class="s1">TEMPLATE_DIR</span><span class="s3">, </span><span class="s1">MEDIA_DIR</span><span class="s3">, </span><span class="s1">DJANGO_SECRET_KEY</span><span class="s3">, </span><span class="s1">DJANGO_DEBUG</span>
+
+<span class="s2">def </span><span class="s1">main</span><span class="s3">():</span>
+    <span class="s0"># Verificar se o Django já foi configurado</span>
+    <span class="s2">if not </span><span class="s1">settings</span><span class="s3">.</span><span class="s1">configured</span><span class="s3">:</span>
+        <span class="s1">settings</span><span class="s3">.</span><span class="s1">configure</span><span class="s3">(</span>
+            <span class="s1">BASE_DIR</span><span class="s3">=</span><span class="s1">BASE_DIR</span><span class="s3">,</span>
+            <span class="s1">SECRET_KEY</span><span class="s3">=</span><span class="s1">DJANGO_SECRET_KEY</span><span class="s3">,</span>
+            <span class="s1">DEBUG</span><span class="s3">=</span><span class="s1">DJANGO_DEBUG</span><span class="s3">,</span>
+            <span class="s1">ALLOWED_HOSTS</span><span class="s3">=[</span><span class="s4">'localhost'</span><span class="s3">, </span><span class="s4">'127.0.0.1'</span><span class="s3">],</span>
+            <span class="s1">INSTALLED_APPS</span><span class="s3">=[</span>
+                <span class="s4">'django.contrib.admin'</span><span class="s3">,</span>
+                <span class="s4">'django.contrib.auth'</span><span class="s3">,</span>
+                <span class="s4">'django.contrib.contenttypes'</span><span class="s3">,</span>
+                <span class="s4">'django.contrib.sessions'</span><span class="s3">,</span>
+                <span class="s4">'django.contrib.messages'</span><span class="s3">,</span>
+                <span class="s4">'django.contrib.staticfiles'</span><span class="s3">,</span>
+                <span class="s4">'app'</span><span class="s3">,  </span><span class="s0"># Seu aplicativo Django</span>
+            <span class="s3">],</span>
+            <span class="s1">MIDDLEWARE</span><span class="s3">=[</span>
+                <span class="s4">'django.middleware.security.SecurityMiddleware'</span><span class="s3">,</span>
+                <span class="s4">'django.contrib.sessions.middleware.SessionMiddleware'</span><span class="s3">,</span>
+                <span class="s4">'django.middleware.common.CommonMiddleware'</span><span class="s3">,</span>
+                <span class="s4">'django.middleware.csrf.CsrfViewMiddleware'</span><span class="s3">,</span>
+                <span class="s4">'django.contrib.auth.middleware.AuthenticationMiddleware'</span><span class="s3">,</span>
+                <span class="s4">'django.contrib.messages.middleware.MessageMiddleware'</span><span class="s3">,</span>
+                <span class="s4">'django.middleware.clickjacking.XFrameOptionsMiddleware'</span><span class="s3">,</span>
+            <span class="s3">],</span>
+            <span class="s1">ROOT_URLCONF</span><span class="s3">=[],  </span><span class="s0"># Não usamos URLs do Django, apenas Flask</span>
+            <span class="s1">TEMPLATES</span><span class="s3">=[{</span>
+                <span class="s4">'BACKEND'</span><span class="s3">: </span><span class="s4">'django.template.backends.django.DjangoTemplates'</span><span class="s3">,</span>
+                <span class="s4">'DIRS'</span><span class="s3">: [</span><span class="s1">TEMPLATE_DIR</span><span class="s3">],  </span><span class="s0"># Diretório de templates do Django</span>
+                <span class="s4">'APP_DIRS'</span><span class="s3">: </span><span class="s2">True</span><span class="s3">,</span>
+                <span class="s4">'OPTIONS'</span><span class="s3">: {</span>
+                    <span class="s4">'context_processors'</span><span class="s3">: [</span>
+                        <span class="s4">'django.template.context_processors.debug'</span><span class="s3">,</span>
+                        <span class="s4">'django.template.context_processors.request'</span><span class="s3">,</span>
+                        <span class="s4">'django.contrib.auth.context_processors.auth'</span><span class="s3">,</span>
+                        <span class="s4">'django.contrib.messages.context_processors.messages'</span><span class="s3">,</span>
+                    <span class="s3">],</span>
+                <span class="s3">},</span>
+            <span class="s3">}],</span>
+            <span class="s1">DATABASES</span><span class="s3">={</span>
+                <span class="s4">'default'</span><span class="s3">: {</span>
+                    <span class="s4">'ENGINE'</span><span class="s3">: </span><span class="s4">'django.db.backends.mysql'</span><span class="s3">,  </span><span class="s0"># Usando banco SQLite para teste</span>
+                    <span class="s4">'NAME'</span><span class="s3">: </span><span class="s1">os</span><span class="s3">.</span><span class="s1">path</span><span class="s3">.</span><span class="s1">join</span><span class="s3">(</span><span class="s1">BASE_DIR</span><span class="s3">, </span><span class="s4">'db.mysql'</span><span class="s3">),  </span><span class="s0"># Banco de dados SQLite</span>
+                <span class="s3">}</span>
+            <span class="s3">},</span>
+            <span class="s1">MEDIA_URL</span><span class="s3">=</span><span class="s4">'/media/'</span><span class="s3">,</span>
+            <span class="s1">MEDIA_ROOT</span><span class="s3">=</span><span class="s1">MEDIA_DIR</span><span class="s3">,  </span><span class="s0"># Diretório de mídia</span>
+            <span class="s1">STATIC_URL</span><span class="s3">=</span><span class="s4">'/static/'</span><span class="s3">,</span>
+            <span class="s1">LANGUAGE_CODE</span><span class="s3">=</span><span class="s4">'pt-br'</span><span class="s3">,</span>
+            <span class="s1">TIME_ZONE</span><span class="s3">=</span><span class="s4">'America/Sao_Paulo'</span><span class="s3">,</span>
+            <span class="s1">USE_I18N</span><span class="s3">=</span><span class="s2">True</span><span class="s3">,</span>
+            <span class="s1">USE_TZ</span><span class="s3">=</span><span class="s2">True</span><span class="s3">,</span>
+            <span class="s1">DEFAULT_AUTO_FIELD</span><span class="s3">=</span><span class="s4">'django.db.models.BigAutoField'</span><span class="s3">,</span>
+        <span class="s3">)</span>
+        <span class="s1">django</span><span class="s3">.</span><span class="s1">setup</span><span class="s3">()  </span><span class="s0"># Inicializa o Django com a configuração</span>
+
+    <span class="s0"># Executar os comandos do Django (como migrate, shell, etc.)</span>
+    <span class="s1">execute_from_command_line</span><span class="s3">(</span><span class="s1">sys</span><span class="s3">.</span><span class="s1">argv</span><span class="s3">)</span>
+
+<span class="s2">if </span><span class="s1">__name__ </span><span class="s3">== </span><span class="s4">'__main__'</span><span class="s3">:</span>
+    <span class="s1">main</span><span class="s3">()</span>
+</pre>
+</body>
+</html>

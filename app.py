@@ -1,9 +1,10 @@
 import os
-import django
-import sys
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory
-from werkzeug.utils import secure_filename
 from decimal import Decimal
+
+import django
+from flask import Flask, request, redirect, url_for, send_from_directory, render_template
+from werkzeug.utils import secure_filename
+
 from config import TEMPLATE_DIR, MEDIA_PRODUTOS_DIR, FLASK_SECRET_KEY, FLASK_DEBUG
 
 # Inicializar Django antes de importar modelos

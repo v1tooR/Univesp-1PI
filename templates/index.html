@@ -29,8 +29,8 @@
                 <td>{{ produto.id }}</td>
                 <td>{{ produto.nome }}</td>
                 <td>R$ {{ produto.preco }}</td>
-                <td>{{ produto.tamanho|default:"-" }}</td>
-                <td>{{ produto.cor|default:"-" }}</td>
+                <td>{{ produto.tamanho}}</td>
+                <td>{{ produto.cor|default }}</td>
                 <td>{{ produto.quantidade }}</td>
                 <td>
                     {% if produto.foto %}

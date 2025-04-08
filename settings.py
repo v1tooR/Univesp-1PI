@@ -2,12 +2,13 @@ import os
 from pathlib import Path
 
 # Configuração básica do Django
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Configuração de segurança
 SECRET_KEY = 'django-insecure-praado123456789store-key'
 DEBUG = True
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+
 
 # Aplicações instaladas
 INSTALLED_APPS = [
@@ -52,12 +53,12 @@ TEMPLATES = [
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': os.path.join(BASE_DIR, "db.sqlite3"),
     }
 }
 
 # Configuração de arquivos estáticos e mídia
-STATIC_URL = 'static/'
+STATIC_URL = 'dinamic'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 

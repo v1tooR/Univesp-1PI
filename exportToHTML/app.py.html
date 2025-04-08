@@ -1,0 +1,160 @@
+<html>
+<head>
+<title>app.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cf8e6d;}
+.s1 { color: #bcbec4;}
+.s2 { color: #bcbec4;}
+.s3 { color: #7a7e85;}
+.s4 { color: #6aab73;}
+.s5 { color: #5f826b; font-style: italic;}
+.s6 { color: #2aacb8;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+app.py</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">os</span>
+<span class="s0">from </span><span class="s1">decimal </span><span class="s0">import </span><span class="s1">Decimal</span>
+
+<span class="s0">import </span><span class="s1">django</span>
+<span class="s0">from </span><span class="s1">flask </span><span class="s0">import </span><span class="s1">Flask</span><span class="s2">, </span><span class="s1">request</span><span class="s2">, </span><span class="s1">redirect</span><span class="s2">, </span><span class="s1">url_for</span><span class="s2">, </span><span class="s1">send_from_directory</span><span class="s2">, </span><span class="s1">render_template</span>
+<span class="s0">from </span><span class="s1">werkzeug</span><span class="s2">.</span><span class="s1">utils </span><span class="s0">import </span><span class="s1">secure_filename</span>
+
+<span class="s0">from </span><span class="s1">config </span><span class="s0">import </span><span class="s1">TEMPLATE_DIR</span><span class="s2">, </span><span class="s1">MEDIA_PRODUTOS_DIR</span><span class="s2">, </span><span class="s1">FLASK_SECRET_KEY</span><span class="s2">, </span><span class="s1">FLASK_DEBUG</span>
+
+<span class="s3"># Inicializar Django antes de importar modelos</span>
+<span class="s1">os</span><span class="s2">.</span><span class="s1">environ</span><span class="s2">[</span><span class="s4">'DJANGO_SETTINGS_MODULE'</span><span class="s2">] = </span><span class="s4">'manage'</span>
+<span class="s1">django</span><span class="s2">.</span><span class="s1">setup</span><span class="s2">()</span>
+
+<span class="s3"># Agora podemos importar modelos Django</span>
+<span class="s0">from </span><span class="s1">app</span><span class="s2">.</span><span class="s1">models </span><span class="s0">import </span><span class="s1">Produto</span>
+
+<span class="s3"># Inicialização do Flask</span>
+<span class="s1">app </span><span class="s2">= </span><span class="s1">Flask</span><span class="s2">(</span><span class="s1">__name__</span><span class="s2">, </span><span class="s1">template_folder</span><span class="s2">=</span><span class="s1">TEMPLATE_DIR</span><span class="s2">)</span>
+<span class="s1">app</span><span class="s2">.</span><span class="s1">secret_key </span><span class="s2">= </span><span class="s1">FLASK_SECRET_KEY</span>
+<span class="s1">app</span><span class="s2">.</span><span class="s1">config</span><span class="s2">[</span><span class="s4">'DEBUG'</span><span class="s2">] = </span><span class="s1">FLASK_DEBUG</span>
+
+<span class="s3"># Função auxiliar para salvar imagens</span>
+<span class="s0">def </span><span class="s1">salvar_imagem</span><span class="s2">(</span><span class="s1">arquivo</span><span class="s2">):</span>
+    <span class="s5">&quot;&quot;&quot;Salva a imagem enviada e retorna o caminho relativo.&quot;&quot;&quot;</span>
+    <span class="s0">if not </span><span class="s1">arquivo </span><span class="s0">or </span><span class="s1">arquivo</span><span class="s2">.</span><span class="s1">filename </span><span class="s2">== </span><span class="s4">''</span><span class="s2">:</span>
+        <span class="s0">return None</span>
+        
+    <span class="s1">filename </span><span class="s2">= </span><span class="s1">secure_filename</span><span class="s2">(</span><span class="s1">arquivo</span><span class="s2">.</span><span class="s1">filename</span><span class="s2">)</span>
+    <span class="s1">filepath </span><span class="s2">= </span><span class="s1">os</span><span class="s2">.</span><span class="s1">path</span><span class="s2">.</span><span class="s1">join</span><span class="s2">(</span><span class="s1">MEDIA_PRODUTOS_DIR</span><span class="s2">, </span><span class="s1">filename</span><span class="s2">)</span>
+    <span class="s1">arquivo</span><span class="s2">.</span><span class="s1">save</span><span class="s2">(</span><span class="s1">filepath</span><span class="s2">)</span>
+    
+    <span class="s3"># Retorna o caminho relativo para salvar no banco</span>
+    <span class="s0">return </span><span class="s4">f'produtos/</span><span class="s0">{</span><span class="s1">filename</span><span class="s0">}</span><span class="s4">'</span>
+
+<span class="s3"># Rota para servir arquivos de mídia</span>
+<span class="s2">@</span><span class="s1">app</span><span class="s2">.</span><span class="s1">route</span><span class="s2">(</span><span class="s4">'/media/&lt;path:filename&gt;'</span><span class="s2">)</span>
+<span class="s0">def </span><span class="s1">media_files</span><span class="s2">(</span><span class="s1">filename</span><span class="s2">):</span>
+    <span class="s5">&quot;&quot;&quot;Serve os arquivos de mídia.&quot;&quot;&quot;</span>
+    <span class="s1">media_dir </span><span class="s2">= </span><span class="s1">os</span><span class="s2">.</span><span class="s1">path</span><span class="s2">.</span><span class="s1">join</span><span class="s2">(</span><span class="s1">os</span><span class="s2">.</span><span class="s1">path</span><span class="s2">.</span><span class="s1">dirname</span><span class="s2">(</span><span class="s1">os</span><span class="s2">.</span><span class="s1">path</span><span class="s2">.</span><span class="s1">abspath</span><span class="s2">(</span><span class="s1">__file__</span><span class="s2">)), </span><span class="s4">'media'</span><span class="s2">)</span>
+    <span class="s0">return </span><span class="s1">send_from_directory</span><span class="s2">(</span><span class="s1">media_dir</span><span class="s2">, </span><span class="s1">filename</span><span class="s2">)</span>
+
+<span class="s3"># Rotas principais da aplicação</span>
+<span class="s2">@</span><span class="s1">app</span><span class="s2">.</span><span class="s1">route</span><span class="s2">(</span><span class="s4">'/'</span><span class="s2">)</span>
+<span class="s0">def </span><span class="s1">index</span><span class="s2">():</span>
+    <span class="s5">&quot;&quot;&quot;Página inicial - Lista todos os produtos.&quot;&quot;&quot;</span>
+    <span class="s0">try</span><span class="s2">:</span>
+        <span class="s1">produtos </span><span class="s2">= </span><span class="s1">Produto</span><span class="s2">.</span><span class="s1">objects</span><span class="s2">.</span><span class="s1">all</span><span class="s2">()</span>
+        <span class="s0">return </span><span class="s1">render_template</span><span class="s2">(</span><span class="s4">'index.html'</span><span class="s2">, </span><span class="s1">produtos</span><span class="s2">=</span><span class="s1">produtos</span><span class="s2">)</span>
+    <span class="s0">except </span><span class="s1">Exception </span><span class="s0">as </span><span class="s1">e</span><span class="s2">:</span>
+        <span class="s1">print</span><span class="s2">(</span><span class="s4">f&quot;Erro ao listar produtos: </span><span class="s0">{</span><span class="s1">e</span><span class="s0">}</span><span class="s4">&quot;</span><span class="s2">)</span>
+        <span class="s0">return </span><span class="s1">render_template</span><span class="s2">(</span><span class="s4">'index.html'</span><span class="s2">, </span><span class="s1">produtos</span><span class="s2">=[], </span><span class="s1">erro</span><span class="s2">=</span><span class="s1">str</span><span class="s2">(</span><span class="s1">e</span><span class="s2">))</span>
+
+<span class="s2">@</span><span class="s1">app</span><span class="s2">.</span><span class="s1">route</span><span class="s2">(</span><span class="s4">'/produto/adicionar'</span><span class="s2">, </span><span class="s1">methods</span><span class="s2">=[</span><span class="s4">'GET'</span><span class="s2">, </span><span class="s4">'POST'</span><span class="s2">])</span>
+<span class="s0">def </span><span class="s1">adicionar_produto</span><span class="s2">():</span>
+    <span class="s5">&quot;&quot;&quot;Rota para adicionar um novo produto.&quot;&quot;&quot;</span>
+    <span class="s0">if </span><span class="s1">request</span><span class="s2">.</span><span class="s1">method </span><span class="s2">== </span><span class="s4">'POST'</span><span class="s2">:</span>
+        <span class="s0">try</span><span class="s2">:</span>
+            <span class="s3"># Obtém dados do formulário</span>
+            <span class="s1">nome </span><span class="s2">= </span><span class="s1">request</span><span class="s2">.</span><span class="s1">form</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s4">'nome'</span><span class="s2">)</span>
+            <span class="s1">preco </span><span class="s2">= </span><span class="s1">Decimal</span><span class="s2">(</span><span class="s1">request</span><span class="s2">.</span><span class="s1">form</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s4">'preco'</span><span class="s2">).</span><span class="s1">replace</span><span class="s2">(</span><span class="s4">','</span><span class="s2">, </span><span class="s4">'.'</span><span class="s2">))</span>
+            <span class="s1">tamanho </span><span class="s2">= </span><span class="s1">request</span><span class="s2">.</span><span class="s1">form</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s4">'tamanho'</span><span class="s2">) </span><span class="s0">or None</span>
+            <span class="s1">cor </span><span class="s2">= </span><span class="s1">request</span><span class="s2">.</span><span class="s1">form</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s4">'cor'</span><span class="s2">) </span><span class="s0">or None</span>
+            <span class="s1">quantidade </span><span class="s2">= </span><span class="s1">int</span><span class="s2">(</span><span class="s1">request</span><span class="s2">.</span><span class="s1">form</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s4">'quantidade'</span><span class="s2">))</span>
+            
+            <span class="s3"># Processar upload de imagem</span>
+            <span class="s1">imagem </span><span class="s2">= </span><span class="s1">request</span><span class="s2">.</span><span class="s1">files</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s4">'foto'</span><span class="s2">)</span>
+            <span class="s1">caminho_imagem </span><span class="s2">= </span><span class="s1">salvar_imagem</span><span class="s2">(</span><span class="s1">imagem</span><span class="s2">) </span><span class="s0">if </span><span class="s1">imagem </span><span class="s0">and </span><span class="s1">imagem</span><span class="s2">.</span><span class="s1">filename </span><span class="s0">else None</span>
+            
+            <span class="s3"># Criar o produto</span>
+            <span class="s1">produto </span><span class="s2">= </span><span class="s1">Produto</span><span class="s2">(</span>
+                <span class="s1">nome</span><span class="s2">=</span><span class="s1">nome</span><span class="s2">,</span>
+                <span class="s1">preco</span><span class="s2">=</span><span class="s1">preco</span><span class="s2">,</span>
+                <span class="s1">tamanho</span><span class="s2">=</span><span class="s1">tamanho</span><span class="s2">,</span>
+                <span class="s1">cor</span><span class="s2">=</span><span class="s1">cor</span><span class="s2">,</span>
+                <span class="s1">quantidade</span><span class="s2">=</span><span class="s1">quantidade</span><span class="s2">,</span>
+                <span class="s1">foto</span><span class="s2">=</span><span class="s1">caminho_imagem</span>
+            <span class="s2">)</span>
+            <span class="s1">produto</span><span class="s2">.</span><span class="s1">save</span><span class="s2">()</span>
+            
+            <span class="s1">print</span><span class="s2">(</span><span class="s4">f&quot;Produto '</span><span class="s0">{</span><span class="s1">nome</span><span class="s0">}</span><span class="s4">' adicionado com sucesso!&quot;</span><span class="s2">)</span>
+            <span class="s0">return </span><span class="s1">redirect</span><span class="s2">(</span><span class="s1">url_for</span><span class="s2">(</span><span class="s4">'index'</span><span class="s2">))</span>
+        <span class="s0">except </span><span class="s1">Exception </span><span class="s0">as </span><span class="s1">e</span><span class="s2">:</span>
+            <span class="s1">print</span><span class="s2">(</span><span class="s4">f&quot;Erro ao adicionar produto: </span><span class="s0">{</span><span class="s1">e</span><span class="s0">}</span><span class="s4">&quot;</span><span class="s2">)</span>
+            <span class="s0">return </span><span class="s1">render_template</span><span class="s2">(</span><span class="s4">'adicionar_produto.html'</span><span class="s2">, </span><span class="s1">erro</span><span class="s2">=</span><span class="s1">str</span><span class="s2">(</span><span class="s1">e</span><span class="s2">))</span>
+    
+    <span class="s0">return </span><span class="s1">render_template</span><span class="s2">(</span><span class="s4">'adicionar_produto.html'</span><span class="s2">)</span>
+
+<span class="s2">@</span><span class="s1">app</span><span class="s2">.</span><span class="s1">route</span><span class="s2">(</span><span class="s4">'/produto/editar/&lt;int:produto_id&gt;'</span><span class="s2">, </span><span class="s1">methods</span><span class="s2">=[</span><span class="s4">'GET'</span><span class="s2">, </span><span class="s4">'POST'</span><span class="s2">])</span>
+<span class="s0">def </span><span class="s1">editar_produto</span><span class="s2">(</span><span class="s1">produto_id</span><span class="s2">):</span>
+    <span class="s5">&quot;&quot;&quot;Rota para editar um produto existente.&quot;&quot;&quot;</span>
+    <span class="s0">try</span><span class="s2">:</span>
+        <span class="s1">produto </span><span class="s2">= </span><span class="s1">Produto</span><span class="s2">.</span><span class="s1">objects</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s1">id</span><span class="s2">=</span><span class="s1">produto_id</span><span class="s2">)</span>
+        
+        <span class="s0">if </span><span class="s1">request</span><span class="s2">.</span><span class="s1">method </span><span class="s2">== </span><span class="s4">'POST'</span><span class="s2">:</span>
+            <span class="s0">try</span><span class="s2">:</span>
+                <span class="s3"># Atualiza os dados do produto</span>
+                <span class="s1">produto</span><span class="s2">.</span><span class="s1">nome </span><span class="s2">= </span><span class="s1">request</span><span class="s2">.</span><span class="s1">form</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s4">'nome'</span><span class="s2">)</span>
+                <span class="s1">produto</span><span class="s2">.</span><span class="s1">preco </span><span class="s2">= </span><span class="s1">Decimal</span><span class="s2">(</span><span class="s1">request</span><span class="s2">.</span><span class="s1">form</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s4">'preco'</span><span class="s2">).</span><span class="s1">replace</span><span class="s2">(</span><span class="s4">','</span><span class="s2">, </span><span class="s4">'.'</span><span class="s2">))</span>
+                <span class="s1">produto</span><span class="s2">.</span><span class="s1">tamanho </span><span class="s2">= </span><span class="s1">request</span><span class="s2">.</span><span class="s1">form</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s4">'tamanho'</span><span class="s2">) </span><span class="s0">or None</span>
+                <span class="s1">produto</span><span class="s2">.</span><span class="s1">cor </span><span class="s2">= </span><span class="s1">request</span><span class="s2">.</span><span class="s1">form</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s4">'cor'</span><span class="s2">) </span><span class="s0">or None</span>
+                <span class="s1">produto</span><span class="s2">.</span><span class="s1">quantidade </span><span class="s2">= </span><span class="s1">int</span><span class="s2">(</span><span class="s1">request</span><span class="s2">.</span><span class="s1">form</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s4">'quantidade'</span><span class="s2">))</span>
+                
+                <span class="s3"># Processar upload de nova imagem, se houver</span>
+                <span class="s1">imagem </span><span class="s2">= </span><span class="s1">request</span><span class="s2">.</span><span class="s1">files</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s4">'foto'</span><span class="s2">)</span>
+                <span class="s0">if </span><span class="s1">imagem </span><span class="s0">and </span><span class="s1">imagem</span><span class="s2">.</span><span class="s1">filename </span><span class="s2">!= </span><span class="s4">''</span><span class="s2">:</span>
+                    <span class="s1">caminho_imagem </span><span class="s2">= </span><span class="s1">salvar_imagem</span><span class="s2">(</span><span class="s1">imagem</span><span class="s2">)</span>
+                    <span class="s1">produto</span><span class="s2">.</span><span class="s1">foto </span><span class="s2">= </span><span class="s1">caminho_imagem</span>
+                
+                <span class="s1">produto</span><span class="s2">.</span><span class="s1">save</span><span class="s2">()</span>
+                <span class="s1">print</span><span class="s2">(</span><span class="s4">f&quot;Produto '</span><span class="s0">{</span><span class="s1">produto</span><span class="s2">.</span><span class="s1">nome</span><span class="s0">}</span><span class="s4">' atualizado com sucesso!&quot;</span><span class="s2">)</span>
+                <span class="s0">return </span><span class="s1">redirect</span><span class="s2">(</span><span class="s1">url_for</span><span class="s2">(</span><span class="s4">'index'</span><span class="s2">))</span>
+            <span class="s0">except </span><span class="s1">Exception </span><span class="s0">as </span><span class="s1">e</span><span class="s2">:</span>
+                <span class="s1">print</span><span class="s2">(</span><span class="s4">f&quot;Erro ao atualizar produto: </span><span class="s0">{</span><span class="s1">e</span><span class="s0">}</span><span class="s4">&quot;</span><span class="s2">)</span>
+                <span class="s0">return </span><span class="s1">render_template</span><span class="s2">(</span><span class="s4">'editar_produto.html'</span><span class="s2">, </span><span class="s1">produto</span><span class="s2">=</span><span class="s1">produto</span><span class="s2">, </span><span class="s1">erro</span><span class="s2">=</span><span class="s1">str</span><span class="s2">(</span><span class="s1">e</span><span class="s2">))</span>
+        
+        <span class="s0">return </span><span class="s1">render_template</span><span class="s2">(</span><span class="s4">'editar_produto.html'</span><span class="s2">, </span><span class="s1">produto</span><span class="s2">=</span><span class="s1">produto</span><span class="s2">)</span>
+    <span class="s0">except </span><span class="s1">Produto</span><span class="s2">.</span><span class="s1">DoesNotExist</span><span class="s2">:</span>
+        <span class="s1">print</span><span class="s2">(</span><span class="s4">f&quot;Produto com ID </span><span class="s0">{</span><span class="s1">produto_id</span><span class="s0">} </span><span class="s4">não encontrado&quot;</span><span class="s2">)</span>
+        <span class="s0">return </span><span class="s1">redirect</span><span class="s2">(</span><span class="s1">url_for</span><span class="s2">(</span><span class="s4">'index'</span><span class="s2">))</span>
+
+<span class="s2">@</span><span class="s1">app</span><span class="s2">.</span><span class="s1">route</span><span class="s2">(</span><span class="s4">'/produto/excluir/&lt;int:produto_id&gt;'</span><span class="s2">)</span>
+<span class="s0">def </span><span class="s1">excluir_produto</span><span class="s2">(</span><span class="s1">produto_id</span><span class="s2">):</span>
+    <span class="s5">&quot;&quot;&quot;Rota para excluir um produto.&quot;&quot;&quot;</span>
+    <span class="s0">try</span><span class="s2">:</span>
+        <span class="s1">produto </span><span class="s2">= </span><span class="s1">Produto</span><span class="s2">.</span><span class="s1">objects</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s1">id</span><span class="s2">=</span><span class="s1">produto_id</span><span class="s2">)</span>
+        <span class="s1">nome </span><span class="s2">= </span><span class="s1">produto</span><span class="s2">.</span><span class="s1">nome</span>
+        <span class="s1">produto</span><span class="s2">.</span><span class="s1">delete</span><span class="s2">()</span>
+        <span class="s1">print</span><span class="s2">(</span><span class="s4">f&quot;Produto '</span><span class="s0">{</span><span class="s1">nome</span><span class="s0">}</span><span class="s4">' excluído com sucesso!&quot;</span><span class="s2">)</span>
+    <span class="s0">except </span><span class="s1">Produto</span><span class="s2">.</span><span class="s1">DoesNotExist</span><span class="s2">:</span>
+        <span class="s1">print</span><span class="s2">(</span><span class="s4">f&quot;Produto com ID </span><span class="s0">{</span><span class="s1">produto_id</span><span class="s0">} </span><span class="s4">não encontrado&quot;</span><span class="s2">)</span>
+    <span class="s0">except </span><span class="s1">Exception </span><span class="s0">as </span><span class="s1">e</span><span class="s2">:</span>
+        <span class="s1">print</span><span class="s2">(</span><span class="s4">f&quot;Erro ao excluir produto: </span><span class="s0">{</span><span class="s1">e</span><span class="s0">}</span><span class="s4">&quot;</span><span class="s2">)</span>
+    
+    <span class="s0">return </span><span class="s1">redirect</span><span class="s2">(</span><span class="s1">url_for</span><span class="s2">(</span><span class="s4">'index'</span><span class="s2">))</span>
+
+<span class="s3"># Inicialização da aplicação</span>
+<span class="s0">if </span><span class="s1">__name__ </span><span class="s2">== </span><span class="s4">'__main__'</span><span class="s2">:</span>
+    <span class="s1">app</span><span class="s2">.</span><span class="s1">run</span><span class="s2">(</span><span class="s1">host</span><span class="s2">=</span><span class="s4">'0.0.0.0'</span><span class="s2">, </span><span class="s1">port</span><span class="s2">=</span><span class="s6">5000</span><span class="s2">)</span></pre>
+</body>
+</html>

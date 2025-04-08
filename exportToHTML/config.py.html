@@ -1,0 +1,39 @@
+<html>
+<head>
+<title>config.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cf8e6d;}
+.s1 { color: #bcbec4;}
+.s2 { color: #7a7e85;}
+.s3 { color: #bcbec4;}
+.s4 { color: #6aab73;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+config.py</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">os</span>
+<span class="s0">from </span><span class="s1">pathlib </span><span class="s0">import </span><span class="s1">Path</span>
+
+<span class="s2"># Diretórios base</span>
+<span class="s1">BASE_DIR </span><span class="s3">= </span><span class="s1">Path</span><span class="s3">(</span><span class="s1">__file__</span><span class="s3">).</span><span class="s1">resolve</span><span class="s3">().</span><span class="s1">parent</span>
+<span class="s1">TEMPLATE_DIR </span><span class="s3">= </span><span class="s1">os</span><span class="s3">.</span><span class="s1">path</span><span class="s3">.</span><span class="s1">join</span><span class="s3">(</span><span class="s1">BASE_DIR</span><span class="s3">, </span><span class="s4">'templates'</span><span class="s3">)</span>
+<span class="s1">MEDIA_DIR </span><span class="s3">= </span><span class="s1">os</span><span class="s3">.</span><span class="s1">path</span><span class="s3">.</span><span class="s1">join</span><span class="s3">(</span><span class="s1">BASE_DIR</span><span class="s3">, </span><span class="s4">'media'</span><span class="s3">)</span>
+<span class="s1">MEDIA_PRODUTOS_DIR </span><span class="s3">= </span><span class="s1">os</span><span class="s3">.</span><span class="s1">path</span><span class="s3">.</span><span class="s1">join</span><span class="s3">(</span><span class="s1">MEDIA_DIR</span><span class="s3">, </span><span class="s4">'produtos'</span><span class="s3">)</span>
+
+<span class="s2"># Certifique-se de que os diretórios existam</span>
+<span class="s1">os</span><span class="s3">.</span><span class="s1">makedirs</span><span class="s3">(</span><span class="s1">MEDIA_PRODUTOS_DIR</span><span class="s3">, </span><span class="s1">exist_ok</span><span class="s3">=</span><span class="s0">True</span><span class="s3">)</span>
+
+<span class="s2"># Configurações para Django</span>
+<span class="s1">DJANGO_SECRET_KEY </span><span class="s3">= </span><span class="s4">'django-insecure-praado123456789store-key'</span>
+<span class="s1">DJANGO_DEBUG </span><span class="s3">= </span><span class="s0">True</span>
+
+<span class="s2"># Configurações para Flask</span>
+<span class="s1">FLASK_SECRET_KEY </span><span class="s3">= </span><span class="s4">'praado-store-flask-key'</span>
+<span class="s1">FLASK_DEBUG </span><span class="s3">= </span><span class="s0">True</span></pre>
+</body>
+</html>

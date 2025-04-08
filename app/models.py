@@ -1,7 +1,8 @@
 from django.db import models
-from django.core.validators import MinValueValidator
+import django.core.validators
 
 class Produto(models.Model):
+
     """
     Modelo para armazenar informações dos produtos no estoque da Praado Store.
     
@@ -15,17 +16,17 @@ class Produto(models.Model):
     - data_cadastro: Data de cadastro do produto (automático)
     - data_atualizacao: Data da última atualização (automático)
     """
-    
+
     # Campos obrigatórios
     nome = models.CharField(max_length=100, verbose_name="Nome")
     preco = models.DecimalField(
         max_digits=10, 
         decimal_places=2, 
-        validators=[MinValueValidator(0.01)],
+        validators=[django.core.validators.MinValueValidator(0.01)],
         verbose_name="Preço"
     )
     quantidade = models.PositiveIntegerField(
-        validators=[MinValueValidator(0)],
+        validators=[django.core.validators.MinValueValidator(0)],
         verbose_name="Quantidade"
     )
     
@@ -52,4 +53,4 @@ class Produto(models.Model):
         verbose_name = "Produto"
         verbose_name_plural = "Produtos"
         ordering = ['nome']
-        app_label = "app"
+        app_label = "your_app_name"
