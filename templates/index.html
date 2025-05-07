@@ -1,57 +1,153 @@
 {% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Produtos</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
 
-{% block content %}
-<h2>Lista de Produtos</h2>
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            background-color: #fff;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
 
-{% if erro %}
-    <div style="color: red; padding: 10px; border: 1px solid red;">
-        <p>Erro ao carregar produtos: {{ erro }}</p>
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .alert {
+            padding: 15px;
+            background-color: #ffdddd;
+            border-left: 6px solid #f44336;
+            margin-bottom: 20px;
+            color: #a94442;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 16px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background 0.3s;
+            margin-top: 20px;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        img.produto-foto {
+            max-width: 80px;
+            height: auto;
+            border-radius: 5px;
+        }
+
+        .acoes a {
+            color: #007bff;
+            text-decoration: none;
+            margin-right: 10px;
+        }
+
+        .acoes a:hover {
+            text-decoration: underline;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        {% block content %}
+        <h2>Lista de Produtos</h2>
+
+        {% if erro %}
+            <div style="color: red; padding: 10px; border: 1px solid red;">
+                <p>Erro ao carregar produtos: {{ erro }}</p>
+            </div>
+        {% endif %}
+
+        {% if produtos %}
+            <table border="1" cellpadding="5" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Preço</th>
+                        <th>Tamanho</th>
+                        <th>Cor</th>
+                        <th>Quantidade</th>
+                        <th>Foto</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for produto in produtos %}
+                    <tr>
+                        <td>{{ produto.id }}</td>
+                        <td>{{ produto.nome }}</td>
+                        <td>R$ {{ produto.preco }}</td>
+                        <td>{{ produto.tamanho}}</td>
+                        <td>{{ produto.cor|default }}</td>
+                        <td>{{ produto.quantidade }}</td>
+                        <td>
+                            {% if produto.foto %}
+                                <img src="{{ url_for('media_files', filename=produto.foto) }}" width="50" height="50" alt="{{ produto.nome }}">
+                            {% else %}
+                                Sem imagem
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('editar_produto', produto_id=produto.id) }}">Editar</a> | 
+                            <a href="{{ url_for('excluir_produto', produto_id=produto.id) }}" onclick="return confirm('Tem certeza que deseja excluir este produto?')">Excluir</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>Nenhum produto cadastrado.</p>
+        {% endif %}
+
+        <p>
+            <a href="{{ url_for('adicionar_produto') }}">Adicionar Novo Produto</a>
+        </p>
+        {% endblock %}
     </div>
-{% endif %}
+</body>
+</html>
 
-{% if produtos %}
-    <table border="1" cellpadding="5" cellspacing="0" width="100%">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nome</th>
-                <th>Preço</th>
-                <th>Tamanho</th>
-                <th>Cor</th>
-                <th>Quantidade</th>
-                <th>Foto</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for produto in produtos %}
-            <tr>
-                <td>{{ produto.id }}</td>
-                <td>{{ produto.nome }}</td>
-                <td>R$ {{ produto.preco }}</td>
-                <td>{{ produto.tamanho}}</td>
-                <td>{{ produto.cor|default }}</td>
-                <td>{{ produto.quantidade }}</td>
-                <td>
-                    {% if produto.foto %}
-                        <img src="{{ url_for('media_files', filename=produto.foto) }}" width="50" height="50" alt="{{ produto.nome }}">
-                    {% else %}
-                        Sem imagem
-                    {% endif %}
-                </td>
-                <td>
-                    <a href="{{ url_for('editar_produto', produto_id=produto.id) }}">Editar</a> | 
-                    <a href="{{ url_for('excluir_produto', produto_id=produto.id) }}" onclick="return confirm('Tem certeza que deseja excluir este produto?')">Excluir</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-{% else %}
-    <p>Nenhum produto cadastrado.</p>
-{% endif %}
 
-<p>
-    <a href="{{ url_for('adicionar_produto') }}">Adicionar Novo Produto</a>
-</p>
-{% endblock %}

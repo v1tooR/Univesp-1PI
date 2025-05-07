@@ -48,13 +48,8 @@ def main():
             }],
             DATABASES={
                 'default': {
-<<<<<<< HEAD
-                    'ENGINE': 'django.db.backends.mysql',  # Usando banco SQLite para teste
-                    'NAME': os.path.join(BASE_DIR, 'db.mysql'),  # Banco de dados SQLite
-=======
                     'ENGINE': 'django.db.backends.sqlite3',  # Usando banco SQLite para teste
                     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),  # Banco de dados SQLite
->>>>>>> aedd9ea1295892fdb6d7657edea7c5361e713ac7
                 }
             },
             MEDIA_URL='/media/',
