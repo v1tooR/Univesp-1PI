@@ -76,13 +76,13 @@ def adicionar_produto():
                 foto=caminho_imagem
             )
             produto.save()
-            
+
             print(f"Produto '{nome}' adicionado com sucesso!")
             return redirect(url_for('index'))
         except Exception as e:
             print(f"Erro ao adicionar produto: {e}")
             return render_template('adicionar_produto.html', erro=str(e))
-    
+
     return render_template('adicionar_produto.html')
 
 @app.route('/produto/editar/<int:produto_id>', methods=['GET', 'POST'])
