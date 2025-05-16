@@ -6,25 +6,29 @@
     <title>Praado Store - Sistema de Estoque</title>
     <style>
         /* Reset básico */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family:"Montserrat", sans-serif;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family:"Montserrat", sans-serif;
             background-color: #f9f9f9;
             color: #333;
             line-height: 1.6;
         }
 
         header {
-            background-color: #2c3e50;
+            background-color:rgb(19, 19, 19);
             color: white;
             padding: 20px 0;
             text-align: center;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+            border-radius:0px 0px 20px 20px;
         }
 
         header h1 {
@@ -35,11 +39,14 @@
             color: #ecf0f1;
             text-decoration: none;
             margin: 0 12px;
-            font-weight: bold;
+            font-weight: 400;
         }
 
         nav a:hover {
-            text-decoration: underline;
+            background-color: white;
+            padding: 10px;
+            color:rgb(19, 19, 19);
+            transition:0.5s;
         }
 
         main {
@@ -53,11 +60,11 @@
         }
 
         footer {
-            background-color: #ecf0f1;
+            background-color:rgb(19, 19, 19);
             text-align: center;
             padding: 15px 0;
             font-size: 0.9rem;
-            color: #555;
+            color: #FFF;
             margin-top: 60px;
         }
 
@@ -78,6 +85,7 @@
 </head>
 <body>
     <header>
+        <img src="../media/logo/AA.png"></img>
         <h1>Praado Store - Gerenciamento de Estoque</h1>
         <nav>
             <a href="{{ url_for('index') }}">Início</a> |
